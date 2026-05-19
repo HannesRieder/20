@@ -587,26 +587,8 @@
     <section class="screen" id="final-screen">
       <div class="final-card card">
         <div>
-          <h2>Du hast Kippel freigeschaltet!</h2><Br>
-          <p>Gratuliere, dein Wissen über Kippel ist jetzt komplett. Öffne den Gutschein und feiere die Reise ins Lötschental.</p>
-        </div>
-        <button class="button" id="reveal-button" type="button">Gutschein öffnen</button>
-
-        <div class="gift-card" id="gift-card">
-          <div class="confetti-container" id="confetti-container"></div>
-          <div style="display:grid; gap:16px; text-align:left;">
-            <div>
-              <p style="margin:0; font-size:0.95rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.16em;">Wert</p>
-              <p style="margin:4px 0 0; font-size:1.8rem; font-weight:700; color:var(--accent);">CHF 50.00</p>
-            </div>
-            <div>
-              <p style="margin:0; font-size:0.95rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.16em;">Einlösungscode</p>
-              <p style="margin:8px 0 0; font-size:1.05rem; font-weight:700; letter-spacing:0.12em;">ZVTZ ENCP IPKF 0TF4</p>
-            </div>
-            <div>
-              <p class="gift-detail">Aus Sicherheitsgründen steht hier nur ein Platzhalter-Code den echten habe ich dir per E-Mail gesendet.</p>
-            </div>
-          </div>
+          <h2>Du hast Kippel freigeschaltet!</h2><br>
+          <p>Gratuliere, dein Wissen über Kippel ist jetzt komplett.</p>
         </div>
       </div>
     </section>
@@ -900,9 +882,6 @@
     const challengeInputArea = document.getElementById('challenge-input-area');
     const challengeSubtext = document.getElementById('challenge-subtext');
     const challengeClose = document.getElementById('challenge-close');
-    const revealButton = document.getElementById('reveal-button');
-    const giftCard = document.getElementById('gift-card');
-    const confettiContainer = document.getElementById('confetti-container');
     const toast = document.getElementById('toast');
 
     function updateProgress() {
@@ -1041,55 +1020,6 @@
       }, 1800);
     }
 
-    function revealGift() {
-      if (state.finalRevealed) return;
-      giftCard.classList.add('revealed');
-      state.finalRevealed = true;
-      playRevealSound();
-      launchConfetti();
-      revealButton.textContent = 'Gutschein geöffnet';
-      showToast('Alles fertig! Jetzt darfst du shoppen.');
-    }
-
-    function launchConfetti() {
-      confettiContainer.innerHTML = '';
-      const count = 32;
-      for (let i = 0; i < count; i += 1) {
-        const confetti = document.createElement('span');
-        const size = Math.floor(Math.random() * 14) + 10;
-        confetti.className = `confetti variant${(i % 5) + 1}`;
-        confetti.style.width = `${size}px`;
-        confetti.style.height = `${Math.floor(size * 1.4)}px`;
-        confetti.style.left = `${Math.random() * 100}%`;
-        confetti.style.animationDelay = `${Math.random() * 0.8}s`;
-        confetti.style.opacity = '0';
-        confettiContainer.appendChild(confetti);
-      }
-      setTimeout(() => confettiContainer.innerHTML = '', 2200);
-    }
-
-    function playRevealSound() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const now = audioCtx.currentTime;
-        const notes = [440, 550, 660];
-        notes.forEach((frequency, index) => {
-          const oscillator = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          oscillator.type = 'sine';
-          oscillator.frequency.value = frequency;
-          oscillator.connect(gain);
-          gain.connect(audioCtx.destination);
-          gain.gain.setValueAtTime(0, now);
-          gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-          oscillator.start(now + index * 0.06);
-          oscillator.stop(now + 0.7 + index * 0.06);
-        });
-      } catch (error) {
-        console.warn('AudioContext wird nicht unterstützt.');
-      }
-    }
 
     document.getElementById('start-button').addEventListener('click', () => {
       updateProgress();
@@ -1105,20 +1035,6 @@
     challengeClose.addEventListener('click', () => {
       showScreen('game');
     });
-
-    revealButton.addEventListener('click', revealGift);
-
-    if (finishButton) {
-      finishButton.addEventListener('click', () => {
-        const total = Object.keys(state.rooms).length;
-        const done = Object.keys(state.rooms).filter(room => state.rooms[room] >= roomConfig[room].questions.length).length;
-        if (done === total) {
-          showScreen('final');
-        } else {
-          showToast('Erledige zuerst alle Räume.');
-        }
-      });
-    }
 
     updateProgress();
   </script>
