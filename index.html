@@ -1,12 +1,1126 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Titel der Webseite</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Kippel Quiz</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #faf7f6;
+      --surface: #ffffff;
+      --surface-soft: #fff1f1;
+      --surface-strong: #f1e7e6;
+      --text: #121212;
+      --muted: #666666;
+      --accent: #b71c1c;
+      --accent-soft: #f8d8d8;
+      --radius: 24px;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.08);
+      font-family: "Neue Haas Grotesk", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 400;
+      line-height: 1.65;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 24px;
+      overflow-x: hidden;
+      background: radial-gradient(circle at top left, rgba(183, 28, 28, 0.08), transparent 22%),
+                  radial-gradient(circle at bottom right, rgba(183, 28, 28, 0.06), transparent 32%),
+                  var(--bg);
+    }
+
+    .page {
+      width: min(100%, 1024px);
+      margin: auto;
+      display: grid;
+      gap: 28px;
+      padding-bottom: 28px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 8px 0 0;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .logo span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    .progress-badge {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .screen {
+      display: none;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      grid-gap: 22px;
+      min-height: 60vh;
+    }
+
+    .screen.active {
+      display: grid;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid rgba(16, 24, 32, 0.08);
+      padding: 26px;
+      display: grid;
+      gap: 22px;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero {
+      display: grid;
+      gap: 22px;
+      padding: 26px 24px;
+      overflow: hidden;
+      position: relative;
+      min-height: 320px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,241,241,0.92));
+      box-shadow: var(--shadow);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 4vw, 3.6rem);
+      line-height: 1.03;
+      letter-spacing: -0.04em;
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 38rem;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    .button,
+    .room-button,
+    .option-button,
+    .action-button {
+      border: none;
+      border-radius: 16px;
+      min-height: 54px;
+      min-width: 120px;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 0.22s ease, background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 24px;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .button,
+    .action-button {
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      box-shadow: 0 18px 35px rgba(183, 28, 28, 0.18);
+    }
+
+    .button:hover,
+    .action-button:hover,
+    .room-button:hover,
+    .option-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .room-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .room-button {
+      background: var(--surface);
+      border: 1px solid rgba(183, 28, 28, 0.12);
+      color: var(--text);
+      font-size: 1.05rem;
+      text-align: left;
+      padding: 26px;
+      gap: 12px;
+      display: grid;
+      min-height: 140px;
+      justify-content: space-between;
+      box-shadow: 0 20px 38px rgba(16, 24, 32, 0.06);
+    }
+
+    .room-button strong {
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .room-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(183, 28, 28, 0.2);
+      box-shadow: 0 26px 48px rgba(16, 24, 32, 0.12);
+    }
+
+    .room-button span.label {
+      font-size: 0.98rem;
+      color: var(--muted);
+    }
+
+    .room-button.done {
+      background: #ffffff;
+      border-color: rgba(16, 24, 32, 0.12);
+    }
+
+    .room-button.done::after {
+      content: "Erledigt";
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      background: #111111;
+      color: #ffffff;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      width: fit-content;
+      margin-top: 6px;
+    }
+
+    .question-card {
+      display: grid;
+      gap: 18px;
+      padding: 22px;
+    }
+
+    .question-card h2 {
+      margin: 0;
+      font-size: 1.55rem;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    .option-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .option-button {
+      background: var(--surface-soft);
+      color: var(--text);
+      text-align: left;
+      padding: 18px 20px;
+      font-size: 1rem;
+      border-radius: 16px;
+      border: 1px solid rgba(183, 28, 28, 0.14);
+      box-shadow: none;
+    }
+
+    .option-button:hover,
+    .option-button:focus-visible {
+      border-color: rgba(183, 28, 28, 0.24);
+      transform: translateY(-1px);
+      outline: none;
+      box-shadow: 0 10px 20px rgba(183, 28, 28, 0.08);
+    }
+
+    .option-button.correct {
+      border-color: #4f8a63;
+      background: #eef6ef;
+      color: #0f3f22;
+    }
+
+    .option-button.wrong {
+      border-color: #c55b5b;
+      background: #f7ebec;
+      color: #6b2f32;
+    }
+
+    .option-button:disabled {
+      opacity: 0.72;
+      cursor: default;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.8;
+    }
+
+    .progress-card {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      background: var(--surface);
+      padding: 18px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(16, 24, 32, 0.08);
+    }
+
+    .progress-text {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      overflow: hidden;
+    }
+
+    .progress-bar span {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #e53935);
+      transition: width 0.35s ease;
+    }
+
+    .challenge-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .challenge-footer .secondary {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .text-input {
+      width: 100%;
+      min-height: 54px;
+      border-radius: 16px;
+      border: 1px solid rgba(16, 24, 32, 0.12);
+      padding: 16px 18px;
+      font-size: 1rem;
+      color: var(--text);
+      background: var(--surface);
+      outline: none;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(15, 78, 116, 0.08);
+    }
+
+    .final-card {
+      display: grid;
+      gap: 20px;
+      padding: 28px;
+      text-align: left;
+    }
+
+    .final-card h2 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 2.7rem);
+      line-height: 1.05;
+    }
+
+    .final-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 1rem;
+    }
+
+    .gift-card {
+      position: relative;
+      display: grid;
+      gap: 16px;
+      background: var(--surface-soft);
+      border-radius: 24px;
+      padding: 28px;
+      border: 1px solid rgba(16, 24, 32, 0.08);
+      transform: scale(0.96);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.4s ease, opacity 0.3s ease;
+    }
+
+    .gift-card.revealed {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .gift-card h3 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .gift-card .gift-detail {
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .confetti-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fall 1.4s ease-in forwards;
+      border-radius: 2px;
+    }
+
+    .confetti.variant2 { background: #3b6390; }
+    .confetti.variant3 { background: #a3b9cf; }
+    .confetti.variant4 { background: #111111; }
+    .confetti.variant5 { background: #ffffff; }
+
+    @keyframes fall {
+      0% { opacity: 0; transform: translateY(-10px) rotate(0deg); }
+      20% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(240px) rotate(360deg); }
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(26px);
+      background: rgba(16, 24, 32, 0.92);
+      color: #ffffff;
+      border-radius: 14px;
+      padding: 14px 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 20;
+      font-size: 0.98rem;
+      max-width: min(92%, 420px);
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (min-width: 640px) {
+      .hero-grid {
+        grid-template-columns: 1.2fr 0.8fr;
+        align-items: center;
+      }
+      .room-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .challenge-footer {
+        flex-wrap: nowrap;
+      }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-
+     {
+      width: 100%;
+      min-height: 250px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.3));
+      box-shadow: 0 18px 40px rgba(16, 24, 32, 0.08);
+      display: grid;
+      place-items: center;
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards;
+    }
+
+    @media (min-width: 900px) {
+      body {
+        padding: 32px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Hallo Welt!</h1>
-    <p>Hier steht der sichtbare Inhalt der Webseite.</p>
+  <div class="page" role="application">
+    <header>
+      <div class="logo">Kippel-Quiz</div>
+      <div class="progress-badge">4/4 Bereiche</div>
+    </header>
+
+    <section class="screen active" id="start-screen">
+      <div class="hero card">
+        <div class="hero-grid">
+          <div>
+            <h1>Bist du bereit für Kippel?</h1><br>
+            <p>Teste dein Wissen über Kippel im Lötschental: von Ortsfakten bis zu Kultur und Geschichte. Beantworte alle Fragen und öffne am Ende den Gutschein.</p><br>
+            <button class="button" id="start-button" type="button">Start</button>
+          </div>
+          <div class="hero-image">
+            <img src="kippel1.jpg" alt="Kippel im Lötschental" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="game-screen">
+      <div class="progress-card">
+        <div>
+          <div class="progress-text" id="progress-text">0/4 Räume erledigt</div>
+          <div class="hint">Tippe einen Raum an und öffne die Überraschung.</div>
+        </div>
+        <div class="progress-bar"><span id="progress-bar"></span></div>
+      </div>
+
+      <div class="room-grid" id="room-grid">
+        <button class="room-button" data-room="livingroom" type="button">
+          <strong>Geografie</strong>
+          <span class="label">Prüfe dein Wissen zur Lage von Kippel.</span>
+        </button>
+        <button class="room-button" data-room="kitchen" type="button">
+          <strong>Geschichte</strong>
+          <span class="label">Fragen zur Vergangenheit des Dorfes.</span>
+        </button>
+        <button class="room-button" data-room="bedroom" type="button">
+          <strong>Kultur</strong>
+          <span class="label">Erkennst du die Traditionen des Lötschentals?</span>
+        </button>
+        <button class="room-button" data-room="entry" type="button">
+          <strong>Kippel</strong>
+          <span class="label">Allgemeine Fakten zum Zielort.</span>
+        </button>
+      </div>
+
+    </section>
+
+    <section class="screen" id="challenge-screen">
+      <div class="card question-card" id="challenge-card">
+        <div>
+          <h2 id="challenge-title">Frage</h2>
+          <p class="hint" id="challenge-description">Wähle die beste Antwort aus oder löse die letzte Herausforderung.</p>
+        </div>
+
+        <div id="challenge-input-area"></div>
+
+        <div class="challenge-footer">
+          <div class="secondary" id="challenge-subtext">Viel Erfolg!</div>
+          <button class="action-button" id="challenge-close" type="button">Zurück</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="final-screen">
+      <div class="final-card card">
+        <div>
+          <h2>Du hast Kippel freigeschaltet!</h2><Br>
+          <p>Gratuliere, dein Wissen über Kippel ist jetzt komplett. Öffne den Gutschein und feiere die Reise ins Lötschental.</p>
+        </div>
+        <button class="button" id="reveal-button" type="button">Gutschein öffnen</button>
+
+        <div class="gift-card" id="gift-card">
+          <div class="confetti-container" id="confetti-container"></div>
+          <div style="display:grid; gap:16px; text-align:left;">
+            <div>
+              <p style="margin:0; font-size:0.95rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.16em;">Wert</p>
+              <p style="margin:4px 0 0; font-size:1.8rem; font-weight:700; color:var(--accent);">CHF 50.00</p>
+            </div>
+            <div>
+              <p style="margin:0; font-size:0.95rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.16em;">Einlösungscode</p>
+              <p style="margin:8px 0 0; font-size:1.05rem; font-weight:700; letter-spacing:0.12em;">ZVTZ ENCP IPKF 0TF4</p>
+            </div>
+            <div>
+              <p class="gift-detail">Aus Sicherheitsgründen steht hier nur ein Platzhalter-Code den echten habe ich dir per E-Mail gesendet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">Gut gemacht! Raum freigeschaltet.</div>
+
+  <script>
+    const state = {
+      rooms: {
+        livingroom: 0,
+        kitchen: 0,
+        bedroom: 0,
+        entry: 0,
+      },
+      currentRoom: null,
+      finalRevealed: false,
+    };
+
+    const roomConfig = {
+      livingroom: {
+        questions: [
+          { title: "Wie lautet die Postleitzahl von Kippel?", description: "(leicht)", answers: [
+            { text: "3917", correct: true },
+            { text: "3920", correct: false },
+            { text: "3900", correct: false },
+            { text: "3930", correct: false },
+          ]},
+          { title: "In welchem Bezirk liegt Kippel?", description: "(leicht)", answers: [
+            { text: "Westlich Raron", correct: true },
+            { text: "Visp", correct: false },
+            { text: "Siders", correct: false },
+            { text: "Brig", correct: false },
+          ]},
+          { title: "In welchem Kanton liegt Kippel?", description: "(leicht)", answers: [
+            { text: "Wallis", correct: true },
+            { text: "Bern", correct: false },
+            { text: "Vaud", correct: false },
+            { text: "Genf", correct: false },
+          ]},
+          { title: "Wie hoch (in Meter über Meer) liegt Kippel?", description: "(leicht)", answers: [
+            { text: "1376 m", correct: true },
+            { text: "1256 m", correct: false },
+            { text: "1521 m", correct: false },
+            { text: "1121 m", correct: false },
+          ]},
+          { title: "Wie viele Einwohner hat Kippel (Stand 2025)?", description: "(leicht)", answers: [
+            { text: "331", correct: true },
+            { text: "551", correct: false },
+            { text: "1221", correct: false },
+            { text: "229", correct: false },
+          ]},
+          { title: "Wie heißt Kippel im walliserdeutschen Dialekt?", description: "(leicht)", answers: [
+            { text: "Chiipl", correct: true },
+            { text: "Kippeli", correct: false },
+            { text: "Chüpl", correct: false },
+            { text: "Kippelchen", correct: false },
+          ]},
+          { title: "Welcher Fluss fließt durch das Lötschental bei Kippel?", description: "(leicht)", answers: [
+            { text: "Lonza", correct: true },
+            { text: "Rhone", correct: false },
+            { text: "Aare", correct: false },
+            { text: "Dala", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Kippel ist der Hauptort des Lötschentals.", description: "(leicht)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Weiss nicht", correct: false },
+            { text: "Vielleicht", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Kippel liegt im Lötschental.", description: "(leicht)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Teilweise", correct: false },
+            { text: "Keine Ahnung", correct: false },
+          ]},
+          { title: "Wahr oder falsch: In Kippel wird Deutsch gesprochen.", description: "(leicht)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Französisch", correct: false },
+            { text: "Italienisch", correct: false },
+          ]},
+        ],
+      },
+      kitchen: {
+        questions: [
+          { title: "Welche geographischen Koordinaten kennzeichnen Kippel?", description: "(mittel)", answers: [
+            { text: "46°24′ N, 7°46′ O", correct: true },
+            { text: "46°20′ N, 7°40′ O", correct: false },
+            { text: "46°30′ N, 7°50′ O", correct: false },
+            { text: "46°10′ N, 7°30′ O", correct: false },
+          ]},
+          { title: "Wie groß ist die Fläche der Gemeinde Kippel?", description: "(mittel)", answers: [
+            { text: "11.68 km²", correct: true },
+            { text: "8.5 km²", correct: false },
+            { text: "15.2 km²", correct: false },
+            { text: "20.1 km²", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Die Entfernung zwischen Kippel und dem Bahnhof Goppenstein beträgt ca. 4 km.", description: "(mittel)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Ungefähr 10 km", correct: false },
+            { text: "Unbekannt", correct: false },
+          ]},
+          { title: "Welcher Berg (über 3000 m) dominiert das Panorama von Kippel?", description: "(mittel)", answers: [
+            { text: "Hockenhorn", correct: true },
+            { text: "Matterhorn", correct: false },
+            { text: "Jungfrau", correct: false },
+            { text: "Dufourspitze", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Es fahren stündlich Postautos von Goppenstein über Kippel ins Lötschental.", description: "(mittel)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Nur täglich", correct: false },
+            { text: "Keine Verbindung", correct: false },
+          ]},
+          { title: "Wer ist der Gemeindepräsident von Kippel?", description: "(mittel)", answers: [
+            { text: "Christian Rieder", correct: true },
+            { text: "Hans Müller", correct: false },
+            { text: "Peter Steiner", correct: false },
+            { text: "Andreas Meier", correct: false },
+          ]},
+          { title: "Wie viele Mitglieder hat der Gemeinderat in Kippel (inklusive Präsident)?", description: "(mittel)", answers: [
+            { text: "5", correct: true },
+            { text: "7", correct: false },
+            { text: "3", correct: false },
+            { text: "9", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Seit 2009 gibt es im Kippel keine Primarschule mehr.", description: "(mittel)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Seit 2015", correct: false },
+            { text: "Nie", correct: false },
+          ]},
+          { title: "Was versteht man im Lötschental unter 'Tschäggättä'?", description: "(mittel)", answers: [
+            { text: "Maskierte Fasnachtsgestalten (Narren mit Holzmasken)", correct: true },
+            { text: "Diverse Bergbauwerkzeuge die in Goppenstein gebraucht wurden", correct: false },
+            { text: "Ein Rezept für ein spezielles Gericht", correct: false },
+            { text: "Die traditionelle Bauart der Häuser", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Die traditionelle Frauentracht im Lötschental heißt 'Lötschentaler Tracht'.", description: "(mittel)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Anderer Name", correct: false },
+            { text: "Keine Tracht", correct: false },
+          ]},
+        ],
+      },
+      bedroom: {
+        questions: [
+          { title: "Wer oder was sind die 'Herrgottsgrenadiere' im Lötschental?", description: "(mittel)", answers: [
+            { text: "Männer in roter Uniform bei kirchlichen Prozessionen", correct: true },
+            { text: "Männer aus dem Musikverein die vorraus marschieren", correct: false },
+            { text: "Männer die den höchsten Rang in der Feuerwehr haben", correct: false },
+            { text: "Männer die als Touristenführer tätig sind", correct: false },
+          ]},
+          { title: "In welchem Zeitraum wird die Lötschentaler Fasnacht mit den Tschäggättä gefeiert?", description: "(mittel)", answers: [
+            { text: "Von Mariä Lichtmess (2. Februar) bis Aschermittwoch", correct: true },
+            { text: "Jedes Jahr ab 1. Januar bis ende Januar", correct: false },
+            { text: "Im Sommer", correct: false },
+            { text: "Im Herbst", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Im Lötschental bezeichnet man nebenberufliche Berglandwirtschaft als 'Arbeiterbauern'.", description: "(mittel)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Nur historisch", correct: false },
+            { text: "Nie", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Im Lötschental werden noch traditionell Schweizer Schwarznasenschafe gehalten.", description: "(mittel)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Nur in Museen", correct: false },
+            { text: "Nicht bekannt", correct: false },
+          ]},
+          { title: "Wahr oder falsch: Viele Lötschentaler arbeiten in der Chemiefabrik Lonza in Visp.", description: "(mittel)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Nur einige", correct: false },
+            { text: "Keine", correct: false },
+          ]},
+          { title: "Wie heißt die Pfarrkirche von Kippel?", description: "(mittel)", answers: [
+            { text: "St. Martin", correct: true },
+            { text: "St. Nikolaus", correct: false },
+            { text: "St. Peter", correct: false },
+            { text: "St. Josef", correct: false },
+          ]},
+          { title: "Wie heißt das regionale Kulturmuseum in Kippel?", description: "(mittel)", answers: [
+            { text: "Lötschentaler Museum", correct: true },
+            { text: "Walliser Museum", correct: false },
+            { text: "Alpines Museum", correct: false },
+            { text: "Bergmuseum", correct: false },
+          ]},
+          { title: "In welchem Jahr wurde das Lötschentaler Museum in Kippel eröffnet?", description: "(schwer)", answers: [
+            { text: "1982", correct: true },
+            { text: "1970", correct: false },
+            { text: "1995", correct: false },
+            { text: "2005", correct: false },
+          ]},
+          { title: "Wahr oder falsch: In den 1960er/70er Jahren gab es in Kippel einen Skilift.", description: "(schwer)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text: "Nur ein Schlepplift", correct: false },
+            { text: "Unsicher", correct: false },
+          ]},
+          { title: "Seit welchem Jahr existiert eine Postauto-Verbindung ins Lötschental?", description: "(schwer)", answers: [
+            { text: "1949", correct: true },
+            { text: "1955", correct: false },
+            { text: "1930", correct: false },
+            { text: "1965", correct: false },
+          ]},
+        ],
+      },
+      entry: {
+        questions: [
+          { title: "Wann wurde in Kippel die Poststelle geschlossen?", description: "(schwer)", answers: [
+            { text: "2011", correct: true },
+            { text: "2000", correct: false },
+            { text: "1990", correct: false },
+            { text: "1980", correct: false },
+          ]},
+          { title: "Wer war Albert Nyfeler?", description: "(schwer)", answers: [
+            { text: "Ein Maler aus dem Lötschental, bekannt als 'Maler des Lötschentals'", correct: true },
+            { text: "Ein Politiker aus Bern", correct: false },
+            { text: "Ein Schweizer Bergführer", correct: false },
+            { text: "Ein Komponist aus Genf", correct: false },
+          ]},
+          { title: "Aus welchem Jahr stammt die Beinhaus-Kapelle von Kippel?", description: "(schwer)", answers: [
+            { text: "1556", correct: true },
+            { text: "1601", correct: false },
+            { text: "1490", correct: false },
+            { text: "1700", correct: false },
+          ]},
+          { title: "Wer war der erste Posthalter in Kippel und wann wurde er ernannt?", description: "(schwer)", answers: [
+            { text: "Johann-Josef Jaggi, 1873", correct: true },
+            { text: "Friedrich Meier, 1850", correct: false },
+            { text: "Karl Huber, 1901", correct: false },
+            { text: "Peter Zogg, 1888", correct: false },
+          ]},
+          { title: "Wann wurde in Kippel die erste Dorfsennerei gegründet?", description: "(schwer)", answers: [
+            { text: "1872", correct: true },
+            { text: "1860", correct: false },
+            { text: "1900", correct: false },
+            { text: "1885", correct: false },
+          ]},
+          { title: "Wann wurde Kippel erstmals urkundlich erwähnt?", description: "(schwer)", answers: [
+            { text: "1437", correct: true },
+            { text: "1500", correct: false },
+            { text: "1600", correct: false },
+            { text: "1700", correct: false },
+          ]},
+          { title: "Wann wurde das Lötschental endgültig von der Herrschaft der Oberen Zenden befreit (Freikauf)?", description: "(schwer)", answers: [
+            { text: "1790", correct: true },
+            { text: "1800", correct: false },
+            { text: "1750", correct: false },
+            { text: "1820", correct: false },
+          ]},
+          { title: "Wann begann der Bau der ersten Kirche in Kippel?", description: "(schwer)", answers: [
+            { text: "1535", correct: true },
+            { text: "1600", correct: false },
+            { text: "1500", correct: false },
+            { text: "1550", correct: false },
+          ]},
+          { title: "Wann wurde die heutige Pfarrkirche St. Martin in Kippel fertiggestellt?", description: "(schwer)", answers: [
+            { text: "1739", correct: true },
+            { text: "1700", correct: false },
+            { text: "1800", correct: false },
+            { text: "1650", correct: false },
+          ]},
+          { title: "Wahr oder falsch: In Kippel wurden archäologische Spuren aus der Bronzezeit gefunden.", description: "(schwer)", answers: [
+            { text: "Wahr", correct: true },
+            { text: "Falsch", correct: false },
+            { text  : "Nur in der Region", correct: false },
+            { text: "Nicht bestätigt", correct: false },
+          ]},
+        ],
+      },
+    };
+
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game: document.getElementById('game-screen'),
+      challenge: document.getElementById('challenge-screen'),
+      final: document.getElementById('final-screen'),
+    };
+
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+    const roomGrid = document.getElementById('room-grid');
+    const challengeTitle = document.getElementById('challenge-title');
+    const challengeDescription = document.getElementById('challenge-description');
+    const challengeInputArea = document.getElementById('challenge-input-area');
+    const challengeSubtext = document.getElementById('challenge-subtext');
+    const challengeClose = document.getElementById('challenge-close');
+    const revealButton = document.getElementById('reveal-button');
+    const giftCard = document.getElementById('gift-card');
+    const confettiContainer = document.getElementById('confetti-container');
+    const toast = document.getElementById('toast');
+
+    function updateProgress() {
+      const total = Object.keys(state.rooms).length;
+      const done = Object.keys(state.rooms).filter(room => state.rooms[room] >= roomConfig[room].questions.length).length;
+      progressText.textContent = `${done}/${total} Räume erledigt`;
+      progressBar.style.width = `${(done / total) * 100}%`;
+      document.querySelector('.progress-badge').textContent = `${done}/${total}`;
+      document.querySelectorAll('.room-button').forEach((button) => {
+        const room = button.dataset.room;
+        button.classList.toggle('done', state.rooms[room] >= roomConfig[room].questions.length);
+      });
+    }
+
+    function showScreen(name) {
+      Object.values(screens).forEach((screen) => screen.classList.remove('active'));
+      screens[name].classList.add('active');
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function openRoom(room) {
+      state.currentRoom = room;
+      const config = roomConfig[room];
+      const index = state.rooms[room];
+      const total = config.questions.length;
+      const completed = index >= total;
+
+      if (completed) {
+        challengeTitle.textContent = 'Raum abgeschlossen';
+        challengeDescription.textContent = 'Du hast bereits alle Fragen in diesem Raum beantwortet.';
+        challengeSubtext.textContent = 'Zurück zur Karte.';
+        challengeInputArea.innerHTML = '';
+        const info = document.createElement('div');
+        info.className = 'hint';
+        info.textContent = `Du hast ${total}/${total} Fragen beantwortet.`;
+        challengeInputArea.appendChild(info);
+        challengeClose.textContent = 'Zurück';
+        showScreen('challenge');
+        return;
+      }
+
+      const question = config.questions[index];
+      challengeTitle.textContent = question.title;
+      challengeDescription.textContent = question.description || '';
+      challengeSubtext.textContent = 'Wähle die beste Antwort.';
+      challengeInputArea.innerHTML = '';
+
+      const optionGrid = document.createElement('div');
+      optionGrid.className = 'option-grid';
+
+      // If this is a true/false question, render only two options: Wahr / Falsch
+      const titleLow = (question.title || '').toLowerCase();
+      let answersToRender;
+      if (titleLow.includes('wahr oder falsch') || titleLow.startsWith('wahr oder falsch')) {
+        const wahrAns = question.answers.find(a => (a.text || '').toLowerCase().startsWith('wahr'));
+        const falschAns = question.answers.find(a => (a.text || '').toLowerCase().startsWith('falsch'));
+        answersToRender = [
+          { text: 'Wahr', correct: !!(wahrAns && wahrAns.correct) },
+          { text: 'Falsch', correct: !!(falschAns && falschAns.correct) },
+        ];
+        // randomize the order of the two options
+        answersToRender = shuffleArray(answersToRender);
+      } else {
+        answersToRender = shuffleArray([...question.answers]);
+      }
+
+      answersToRender.forEach((answer) => {
+        const option = document.createElement('button');
+        option.className = 'option-button';
+        option.type = 'button';
+        option.textContent = answer.text;
+        option.addEventListener('click', () => selectAnswer(option, answer.correct));
+        optionGrid.appendChild(option);
+      });
+      challengeInputArea.appendChild(optionGrid);
+      challengeClose.textContent = 'Abbrechen';
+      showScreen('challenge');
+    }
+
+    function selectAnswer(button, correct) {
+      if (button.disabled) return;
+      const allOptions = [...button.closest('.option-grid').children];
+      allOptions.forEach((option) => option.disabled = true);
+      if (correct) {
+        button.classList.add('correct');
+        state.rooms[state.currentRoom] += 1;
+        updateProgress();
+        showToast('Richtig!');
+        setTimeout(() => {
+          const config = roomConfig[state.currentRoom];
+          if (state.rooms[state.currentRoom] >= config.questions.length) {
+            completeRoom(state.currentRoom);
+          } else {
+            openRoom(state.currentRoom);
+          }
+        }, 600);
+      } else {
+        button.classList.add('wrong');
+        challengeSubtext.textContent = 'Das war leider falsch. Versuch es noch einmal.';
+        setTimeout(() => {
+          allOptions.forEach((option) => {
+            option.classList.remove('wrong');
+            option.disabled = false;
+          });
+          challengeSubtext.textContent = 'Wähle die beste Antwort.';
+        }, 700);
+      }
+    }
+
+    function completeRoom(room) {
+      updateProgress();
+      showToast('Raum freigeschaltet!');
+      setTimeout(() => {
+        const allDone = Object.keys(state.rooms).every(r => state.rooms[r] >= roomConfig[r].questions.length);
+        if (allDone) {
+          showScreen('final');
+          return;
+        }
+        showScreen('game');
+      }, 700);
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toast.hideTimeout);
+      toast.hideTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1800);
+    }
+
+    function revealGift() {
+      if (state.finalRevealed) return;
+      giftCard.classList.add('revealed');
+      state.finalRevealed = true;
+      playRevealSound();
+      launchConfetti();
+      revealButton.textContent = 'Gutschein geöffnet';
+      showToast('Alles fertig! Jetzt darfst du shoppen.');
+    }
+
+    function launchConfetti() {
+      confettiContainer.innerHTML = '';
+      const count = 32;
+      for (let i = 0; i < count; i += 1) {
+        const confetti = document.createElement('span');
+        const size = Math.floor(Math.random() * 14) + 10;
+        confetti.className = `confetti variant${(i % 5) + 1}`;
+        confetti.style.width = `${size}px`;
+        confetti.style.height = `${Math.floor(size * 1.4)}px`;
+        confetti.style.left = `${Math.random() * 100}%`;
+        confetti.style.animationDelay = `${Math.random() * 0.8}s`;
+        confetti.style.opacity = '0';
+        confettiContainer.appendChild(confetti);
+      }
+      setTimeout(() => confettiContainer.innerHTML = '', 2200);
+    }
+
+    function playRevealSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+        const notes = [440, 550, 660];
+        notes.forEach((frequency, index) => {
+          const oscillator = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.value = frequency;
+          oscillator.connect(gain);
+          gain.connect(audioCtx.destination);
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          oscillator.start(now + index * 0.06);
+          oscillator.stop(now + 0.7 + index * 0.06);
+        });
+      } catch (error) {
+        console.warn('AudioContext wird nicht unterstützt.');
+      }
+    }
+
+    document.getElementById('start-button').addEventListener('click', () => {
+      updateProgress();
+      showScreen('game');
+    });
+
+    roomGrid.addEventListener('click', (event) => {
+      const button = event.target.closest('.room-button');
+      if (!button) return;
+      openRoom(button.dataset.room);
+    });
+
+    challengeClose.addEventListener('click', () => {
+      showScreen('game');
+    });
+
+    revealButton.addEventListener('click', revealGift);
+
+    if (finishButton) {
+      finishButton.addEventListener('click', () => {
+        const total = Object.keys(state.rooms).length;
+        const done = Object.keys(state.rooms).filter(room => state.rooms[room] >= roomConfig[room].questions.length).length;
+        if (done === total) {
+          showScreen('final');
+        } else {
+          showToast('Erledige zuerst alle Räume.');
+        }
+      });
+    }
+
+    updateProgress();
+  </script>
 </body>
 </html>
